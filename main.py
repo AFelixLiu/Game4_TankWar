@@ -102,8 +102,13 @@ def main():
     running_T1 = True
     running_T2 = True
     clock = pygame.time.Clock()
+    # gameover文字显示
+    pygame.font.init()
+    fontOver=pygame.font.Font(r".\font\Modern No. 20.ttf",60)
+    textGameOver = fontOver.render("GAME OVER",True,(255,255,255),(58,58,58))
     # 游戏循环
-    while True:
+    gameStatus = True
+    while gameStatus:
         for event in pygame.event.get():
             # 退出事件
             if event.type == pygame.QUIT:
@@ -301,27 +306,6 @@ def main():
         # 绘制石头砖墙
         for each in bgMap.ironGroup:
             screen.blit(each.image, each.rect)
-        # 绘制home
-        if homeSurvive:
-            screen.blit(HOME.image, HOME.rect)
-        else: 
-            if HOME.time==0:
-                HOME.time=pygame.time.get_ticks()
-            else:
-                tempTime = pygame.time.get_ticks()
-                sub = tempTime-HOME.time
-                t =100 # 控制动画速度
-                if sub <= t:
-                    screen.blit(homeBomb[0], HOME.rect)
-                elif sub <= t*2:
-                    screen.blit(homeBomb[1], HOME.rect)
-                elif sub <= t*3:
-                    screen.blit(homeBomb[2], HOME.rect)
-                elif sub<= t*4:
-                    screen.blit(homeBomb[3], HOME.rect)
-                else:
-                    screen.blit(homeBomb[4], HOME.rect)
-            # screen.blit(HOME_DESTROYED.image, HOME_DESTROYED.rect)
         # 绘制玩家一
         if not (delay % 5):
             switch_R1_R2_image = not switch_R1_R2_image
@@ -531,6 +515,30 @@ def main():
         # 绘制树
         for each in bgMap.treeGroup:
             screen.blit(each.image, each.rect)
+        # 绘制home
+        if homeSurvive:
+            screen.blit(HOME.image, HOME.rect)
+        else: 
+            if HOME.time==0:
+                HOME.time=pygame.time.get_ticks()
+            else:
+                tempTime = pygame.time.get_ticks()
+                sub = tempTime-HOME.time
+                t =100 # 控制动画速度
+                if sub <= t:
+                    screen.blit(homeBomb[0], HOME.rect)
+                elif sub <= t*2:
+                    screen.blit(homeBomb[1], HOME.rect)
+                elif sub <= t*3:
+                    screen.blit(homeBomb[2], HOME.rect)
+                elif sub<= t*4:
+                    screen.blit(homeBomb[3], HOME.rect)
+                elif sub<= t*12:
+                    screen.blit(homeBomb[4], HOME.rect)
+                else:
+                    screen.blit(textGameOver,(120,300))
+                    # gameStatus = False
+            # screen.blit(HOME_DESTROYED.image, HOME_DESTROYED.rect)
         # 延迟
         delay -= 1
         if not delay:
