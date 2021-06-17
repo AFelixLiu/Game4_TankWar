@@ -9,7 +9,7 @@ import enemyTank
 
 def main():
     pygame.init()  # 初始化pygame所有模块
-
+#ceshi
     resolution = (630, 630)  # 指明图形窗口分辨率
     screen = pygame.display.set_mode(resolution)  # 创建图形窗口
     pygame.display.set_caption("坦克大战")  # 设置窗口标题
