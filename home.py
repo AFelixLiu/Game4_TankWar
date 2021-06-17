@@ -3,7 +3,7 @@ import pygame
 class Home(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()  # 调用父类初始化方法
-
+        self.time = 0
         self.image = pygame.image.load(r".\image\home.png").convert_alpha()  # 加载home图
         self.image.set_colorkey((255, 255, 255))  # 设置透明颜色键
         self.rect = self.image.get_rect()  # 获取位置信息

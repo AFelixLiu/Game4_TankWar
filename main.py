@@ -69,6 +69,14 @@ def main():
     appearance.append(appearance_image.subsurface((48, 0), (48, 48)))
     appearance.append(appearance_image.subsurface((96, 0), (48, 48)))
 
+    homeBomb_image = pygame.image.load(r".\image\boom_dynamic.png").convert_alpha()
+    homeBomb = []
+    homeBomb.append(homeBomb_image.subsurface((0,0),(48,48)))
+    homeBomb.append(homeBomb_image.subsurface((48,0),(48,48)))
+    homeBomb.append(homeBomb_image.subsurface((96,0),(48, 48)))
+    homeBomb.append(homeBomb_image.subsurface((144,0),(48, 48)))
+    homeBomb.append(homeBomb_image.subsurface((192,0),(48, 48)))
+
     # 设置敌方坦克延迟200
     DELAYEVENT = pygame.constants.USEREVENT  # 自定义计时事件
     pygame.time.set_timer(DELAYEVENT, 200)  # 每隔指定时间发送一次自定义事件
@@ -185,7 +193,7 @@ def main():
 
         if not moving:
             if key_pressed[pygame.K_w]:
-                moving = 3
+                moving = 7
                 movdir = 0
                 running_T1 = True
                 allTankGroup.remove(myTank_T1)
@@ -193,7 +201,7 @@ def main():
                     moving = 0  # 碰撞即暂停
                 allTankGroup.add(myTank_T1)
             elif key_pressed[pygame.K_s]:
-                moving = 3
+                moving = 7
                 movdir = 1
                 running_T1 = True
                 allTankGroup.remove(myTank_T1)
@@ -201,7 +209,7 @@ def main():
                     moving = 0
                 allTankGroup.add(myTank_T1)
             elif key_pressed[pygame.K_a]:
-                moving = 3
+                moving = 7
                 movdir = 2
                 running_T1 = True
                 allTankGroup.remove(myTank_T1)
@@ -209,7 +217,7 @@ def main():
                     moving = 0
                 allTankGroup.add(myTank_T1)
             elif key_pressed[pygame.K_d]:
-                moving = 3
+                moving = 7
                 movdir = 3
                 running_T1 = True
                 allTankGroup.remove(myTank_T1)
@@ -296,8 +304,24 @@ def main():
         # 绘制home
         if homeSurvive:
             screen.blit(HOME.image, HOME.rect)
-        else:
-            screen.blit(HOME_DESTROYED.image, HOME_DESTROYED.rect)
+        else: 
+            if HOME.time==0:
+                HOME.time=pygame.time.get_ticks()
+            else:
+                tempTime = pygame.time.get_ticks()
+                sub = tempTime-HOME.time
+                t =100 # 控制动画速度
+                if sub <= t:
+                    screen.blit(homeBomb[0], HOME.rect)
+                elif sub <= t*2:
+                    screen.blit(homeBomb[1], HOME.rect)
+                elif sub <= t*3:
+                    screen.blit(homeBomb[2], HOME.rect)
+                elif sub<= t*4:
+                    screen.blit(homeBomb[3], HOME.rect)
+                else:
+                    screen.blit(homeBomb[4], HOME.rect)
+            # screen.blit(HOME_DESTROYED.image, HOME_DESTROYED.rect)
         # 绘制玩家一
         if not (delay % 5):
             switch_R1_R2_image = not switch_R1_R2_image
@@ -368,11 +392,14 @@ def main():
                     # 检测敌方子弹碰撞情况
                     if pygame.sprite.collide_rect(each.bullet, myTank_T1):  # 碰撞玩家一
                         bang_sound.play()  # 播放中弹音效
-                        myTank_T1.rect.left, myTank_T1.rect.top = 3 + 8 * 24, 3 + 24 * 24  # 重置玩家位置
-                        each.bullet.life = False  # 子弹失去生命
-                        moving = 0  # 重置玩家移动控制参数
-                        for i in range(myTank_T1.level + 1):
-                            myTank_T1.levelDown()  # 玩家等级降为最低
+                        if(myTank_T1.level==0):
+                            each.bullet.life = False  # 子弹失去生命
+                            moving = 0  # 重置玩家移动控制参数
+                            for i in range(myTank_T1.level + 1):
+                                myTank_T1.levelDown()  # 玩家等级降为最低
+                            myTank_T1.rect.left, myTank_T1.rect.top = 3 + 8 * 24, 3 + 24 * 24  # 重置玩家位置
+                        else:
+                            myTank_T1.level-=1;
                     if pygame.sprite.collide_rect(each.bullet, myTank_T2):  # 碰撞玩家二
                         bang_sound.play()
                         myTank_T2.rect.left, myTank_T2.rect.top = 3 + 16 * 24, 3 + 24 * 24
@@ -389,6 +416,7 @@ def main():
                             each.bullet.life = False
                     if pygame.sprite.collide_rect(each.bullet, HOME):  # 碰撞home
                         homeSurvive = False
+                        
         # 绘制玩家一子弹
         if myTank_T1.bullet.life:  # 执行shoot()函数后子弹被赋予生命
             myTank_T1.bullet.move()  # 子弹移动并进行边界碰撞检测
@@ -437,6 +465,9 @@ def main():
                 if pygame.sprite.spritecollide(myTank_T1.bullet, bgMap.ironGroup, True, None):
                     myTank_T1.bullet.life = False
                     myTank_T1.bullet.rect.left, myTank_T1.bullet.rect.right = 3 + 12 * 24, 3 + 24 * 24
+            # 子弹碰撞home
+            if pygame.sprite.collide_rect(myTank_T1.bullet, HOME):  # 碰撞home
+                        homeSurvive = False
             else:
                 if pygame.sprite.spritecollide(myTank_T1.bullet, bgMap.ironGroup, False, None):
                     myTank_T1.bullet.life = False
